@@ -6,7 +6,7 @@
 <br>
 
 **Write**: Reflect on your previous work and how you would adjust to include ethics and inequity components. Total length should be a few paragraphs, no more than one page.
-
+                                  Reflection
 In revisiting my previous work and contemplating the integration of ethics and equity components into the banking system, I find myself drawn to a critical reflection on the role of responsibility and accountability in our technological advancements. The banking sector, as a cornerstone of global economics, stands as a prime example of where ethical considerations are paramount, influencing not only financial transactions but also societal trust and well-being.
 
 Introducing strict audit measures across all processes represents a fundamental shift towards ensuring transparency and integrity within the banking system. By subjecting every operation to rigorous scrutiny, we uphold a commitment to ethical conduct and accountability. Such audits serve not only as a means of identifying and rectifying potential lapses but also as a proactive measure to prevent unethical practices from taking root.
