@@ -121,7 +121,9 @@ Review the AdventureWorks Schema [here](https://i.stack.imgur.com/LMu4W.gif)
 
 Highlight at least two differences between it and your ERD. Would you change anything in yours?
 ```
-
+The AdventureWorks ERD is reach business domain schema. It displays entities for Production, Person, Sales, Purchasing. The ERD contains information bout the version, how to print it ansd other useful information.   
+It is not clear from EDR the column types, besides that it show some specific db monitoring information for DBA.
+My EDR displays column types, however it missing colors which can help to navigate over domains.  These are 2 difference. I would add colors schema to my EDR.
 ```
 
 # Criteria
