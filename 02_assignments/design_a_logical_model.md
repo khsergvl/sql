@@ -86,12 +86,34 @@ CREATE TABLE IF NOT EXISTS ShiftType (
 );   
 
 ## Question 3
-The store wants to keep customer addresses. Propose two architectures for the CUSTOMER_ADDRESS table, one that will retain changes, and another that will overwrite. Which is type 1, which is type 2?
+The store wants to keep customer addresses. Propose two architectures for the CUSTOMER_ADDRESS table, one that will retain changes, and another that will overwrite. Which is type 1, which is type 2?   
 
-_Hint, search type 1 vs type 2 slowly changing dimensions._
+Type 1   
+CREATE TABLE IF NOT EXISTS CustomerAddress (   
+        id INT PRIMARY KEY,   
+	customer_id INT,   
+	address VARCHAR(100),   
+	unit VARCHAR(3),   
+	zip VARCHAR(6),   
+	region VARCHAR(100),   
+	country VARCHAR(100),   
+	FOREIGN KEY (customer_id) REFERENCES Customer(id)
+);   
+
+Type 2 - no history, overwrite, primary key is cusotmer id, records are not unique per Customer
+CREATE TABLE IF NOT EXISTS CustomerAddress (   
+        customer_id INT PRIMARY KEY,   
+	address VARCHAR(100),   
+	unit VARCHAR(3),   
+	zip VARCHAR(6),   
+	region VARCHAR(100),   
+	country VARCHAR(100),   
+	FOREIGN KEY (customer_id) REFERENCES Customer(id)
+);   
 
 Bonus: Are there privacy implications to this, why or why not?
 ```
+Audit logs is best practise. So history here is must have. It will prevents i.e. Employee to send orders themself and revert address.   
 ```
 
 ## Question 4
@@ -99,7 +121,7 @@ Review the AdventureWorks Schema [here](https://i.stack.imgur.com/LMu4W.gif)
 
 Highlight at least two differences between it and your ERD. Would you change anything in yours?
 ```
-Your answer...
+
 ```
 
 # Criteria
