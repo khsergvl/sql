@@ -6,84 +6,85 @@ Create a logical model for a small bookstore. 📚
 At the minimum it should have employee, order, sales, customer, and book entities (tables). Determine sensible column and table design based on what you know about these concepts. Keep it simple, but work out sensible relationships to keep tables reasonably sized. Include a date table. There are several tools online you can use, I'd recommend [_Draw.io_](https://www.drawio.com/) or [_LucidChart_](https://www.lucidchart.com/pages/).
 
 ### Schema and queries   
-![EDR1.png](./EDR1.png)
-CREATE TABLE IF NOT EXISTS Employee (
-    id INT PRIMARY KEY,
-    first_name VARCHAR(100),
-    last_name VARCHAR(100),
-    title VARCHAR(100),
-    boss_id INT,
-    join_date timestamp
-);
+![EDR1.png](./EDR1.png)   
+CREATE TABLE IF NOT EXISTS Employee (   
+    id INT PRIMARY KEY,   
+    first_name VARCHAR(100),   
+    last_name VARCHAR(100),   
+    title VARCHAR(100),   
+    boss_id INT,   
+    join_date timestamp   
+);   
 
-CREATE TABLE IF NOT EXISTS Orders (
-   id INT PRIMARY KEY,
-   customer_id INT,
-   created_at timestamp,
-   book_id INT,
-   order_ammount INT,
-   FOREIGN KEY (customer_id) REFERENCES Customer(id),
-   FOREIGN KEY (book_id) REFERENCES Book(id)
-);
+CREATE TABLE IF NOT EXISTS Orders (   
+   id INT PRIMARY KEY,   
+   customer_id INT,   
+   created_at timestamp,   
+   book_id INT,   
+   order_ammount INT,   
+   FOREIGN KEY (customer_id) REFERENCES Customer(id),   
+   FOREIGN KEY (book_id) REFERENCES Book(id)   
+);   
 
-CREATE TABLE IF NOT EXISTS Sales (
-    id INT PRIMARY KEY,
-    employee_id INT,
-    order_id INT,
-    created_at timestamp,
-    processed_date_id INT,
-    FOREIGN KEY (employee_id) REFERENCES Employee(id),
-    FOREIGN KEY (order_id) REFERENCES Orders(id),
-    FOREIGN KEY (processed_date_id) REFERENCES Dates(id)
-);
+CREATE TABLE IF NOT EXISTS Sales (   
+    id INT PRIMARY KEY,   
+    employee_id INT,   
+    order_id INT,   
+    created_at timestamp,   
+    processed_date_id INT,   
+    FOREIGN KEY (employee_id) REFERENCES Employee(id),   
+    FOREIGN KEY (order_id) REFERENCES Orders(id),   
+    FOREIGN KEY (processed_date_id) REFERENCES Dates(id)   
+);   
 
-CREATE TABLE IF NOT EXISTS Customer (
-    id INT PRIMARY KEY,
-    first_name VARCHAR(100),
-	last_name VARCHAR(100),
-    email VARCHAR(100),
-    billing_adress VARCHAR(200),
-    zip VARCHAR(6)
-);
+CREATE TABLE IF NOT EXISTS Customer (   
+    id INT PRIMARY KEY,   
+    first_name VARCHAR(100),   
+	last_name VARCHAR(100),   
+    email VARCHAR(100),   
+    billing_adress VARCHAR(200),   
+    zip VARCHAR(6)   
+);   
 
-CREATE TABLE IF NOT EXISTS Book (
-    id INT PRIMARY KEY,
-    title VARCHAR(100),
-    author VARCHAR(100),
-    isbn VARCHAR(50),
-    price DECIMAL(12, 3),
-    currency VARCHAR(3),
-    quantity INT
-);
+CREATE TABLE IF NOT EXISTS Book (   
+    id INT PRIMARY KEY,   
+    title VARCHAR(100),   
+    author VARCHAR(100),   
+    isbn VARCHAR(50),   
+    price DECIMAL(12, 3),   
+    currency VARCHAR(3),   
+    quantity INT   
+);   
 
-CREATE TABLE IF NOT EXISTS Dates (
-   id INT PRIMARY KEY,
-   year INT,
-   month INT,
-   day INT,
-   timezone_date VARCHAR(3)
-);
+CREATE TABLE IF NOT EXISTS Dates (   
+   id INT PRIMARY KEY,   
+   year INT,   
+   month INT,   
+   day INT,   
+   timezone_date VARCHAR(3)   
+);   
 
 ## Question 2
+![EDR2.png](./EDR2.png)
 We want to create employee shifts, splitting up the day into morning and evening. Add this to the ERD.    
 As sqlite doesn't support enums, shift types moved to another table.   
+    
+CREATE TABLE IF NOT EXISTS Shift (   
+    id INT PRIMARY KEY,   
+    shift_type_id id,   
+    employee_id INT,   
+    shift_date_id INT,   
+    FOREIGN KEY (employee_id) REFERENCES Employee(id),   
+    FOREIGN KEY (shift_date_id) REFERENCES Dates(id),   
+    FOREIGN KEY (shift_type_id) REFERENCES ShiftType(id)   
+);   
 
-CREATE TABLE IF NOT EXISTS Shift (
-    id INT PRIMARY KEY,
-    shift_type_id id,
-    employee_id INT,
-    shift_date_id INT,
-    FOREIGN KEY (employee_id) REFERENCES Employee(id),
-    FOREIGN KEY (shift_date_id) REFERENCES Dates(id),
-    FOREIGN KEY (shift_type_id) REFERENCES ShiftType(id)
+CREATE TABLE IF NOT EXISTS ShiftType (   
+    id INT PRIMARY KEY,   
+    // specify type here    
+    shift_type VARCHAR(100)   
+);   
 
-);
-
-CREATE TABLE IF NOT EXISTS ShiftType (
-    id INT PRIMARY KEY,
-    // specify type here 
-    shift_type VARCHAR(100)
-);
 ## Question 3
 The store wants to keep customer addresses. Propose two architectures for the CUSTOMER_ADDRESS table, one that will retain changes, and another that will overwrite. Which is type 1, which is type 2?
 
