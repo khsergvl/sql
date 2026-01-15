@@ -1,0 +1,99 @@
+name: Validate Assignment Submission
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract assignment number from branch name
+        id: branch
+        run: |
+          BRANCH="${{ github.head_ref }}"
+          echo "Branch name: $BRANCH"
+
+          if [[ ! "$BRANCH" =~ ^assignment-([0-9]+)$ ]]; then
+            echo "error=❌ Invalid branch name. Expected assignment-<number> (e.g. assignment-1)" >> "$GITHUB_OUTPUT"
+            echo "valid=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          ASSIGNMENT_NUMBER="${BASH_REMATCH[1]}"
+          echo "Assignment number: $ASSIGNMENT_NUMBER"
+
+          echo "valid=true" >> "$GITHUB_OUTPUT"
+          echo "assignment_number=$ASSIGNMENT_NUMBER" >> "$GITHUB_OUTPUT"
+
+      - name: Get changed files
+        id: changes
+        if: steps.branch.outputs.valid == 'true'
+        run: |
+          BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          HEAD_SHA="${{ github.event.pull_request.head.sha }}"
+
+          git diff --name-only "$BASE_SHA" "$HEAD_SHA" > changed_files.txt
+          FILE_COUNT=$(wc -l < changed_files.txt | tr -d ' ')
+
+          echo "Changed files:"
+          cat changed_files.txt
+
+          echo "file_count=$FILE_COUNT" >> "$GITHUB_OUTPUT"
+
+      - name: Validate changed files
+        id: validate
+        if: steps.branch.outputs.valid == 'true'
+        run: |
+          ERRORS=()
+
+          FILE_COUNT="${{ steps.changes.outputs.file_count }}"
+          ASSIGNMENT_NUMBER="${{ steps.branch.outputs.assignment_number }}"
+          REQUIRED_FILE="assignment${ASSIGNMENT_NUMBER}.sql"
+
+          if [[ "$FILE_COUNT" -lt 3 || "$FILE_COUNT" -gt 4 ]]; then
+            ERRORS+=("❌ Invalid number of changed files: **$FILE_COUNT** (expected **3–4**).")
+          fi
+
+          if ! grep -q "$REQUIRED_FILE" changed_files.txt; then
+            ERRORS+=("❌ Required file **$REQUIRED_FILE** was not modified.")
+          fi
+
+          if [[ "${#ERRORS[@]}" -gt 0 ]]; then
+            printf "%s\n" "${ERRORS[@]}" > errors.txt
+            exit 1
+          fi
+
+      - name: Post failure comment to PR
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs')
+
+            let body = '### ❌ Assignment Git Flow Validation Failed\n\n'
+
+            if (fs.existsSync('errors.txt')) {
+              const errors = fs.readFileSync('errors.txt', 'utf8')
+              body += errors.split('\n').map(e => `- ${e}`).join('\n')
+            } else {
+              body += '- ❌ Branch name must follow `assignment-<number>` (e.g. `assignment-1`)'
+            }
+
+            body += '\n\nIt make sense to review files commited and push an update.'
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body
+            })
