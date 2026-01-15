@@ -1,0 +1,62 @@
+name: SQL Unit Tests
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run tests
+        id: pytest
+        run: |
+          pytest --tb=short --disable-warnings --maxfail=1 \
+                 --junitxml=pytest-report.xml || true
+
+      - name: Post test results to PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs')
+            const xml = fs.readFileSync('pytest-report.xml', 'utf8')
+
+            const passed = (xml.match(/testsuite.*tests="(\d+)"/) || [])[1]
+            const failed = (xml.match(/failures="(\d+)"/) || [])[1]
+
+            let body = `### 🧪 SQL Unit Test Results\n\n`
+            body += `✅ Passed: **${passed - failed}**\n`
+            body += `❌ Failed: **${failed}**\n\n`
+
+            if (failed > 0) {
+              body += `Please review the failed assertions and update your SQL.`
+            } else {
+              body += `🎉 All tests passed. Good job!`
+            }
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body
+            })
+
+      - name: Fail job if tests failed
+        run: |
+          grep -q 'failures="0"' pytest-report.xml
