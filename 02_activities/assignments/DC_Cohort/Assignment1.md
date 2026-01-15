@@ -202,7 +202,7 @@ Link if you encounter a paywall: https://archive.is/srKHV or https://web.archive
 **What values systems are embedded in databases and data systems you encounter in your day-to-day life?**
 
 Consider, for example, concepts of fariness, inequality, social structures, marginalization, intersection of technology and society, etc.
-
+егнгонегш
 
 ```
 Your thoughts...

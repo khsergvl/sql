@@ -1,7 +1,7 @@
 /* ASSIGNMENT 1 */
 /* SECTION 2 */
 
-
+1111
 --SELECT
 /* 1. Write a query that returns everything in the customer table. */
 
