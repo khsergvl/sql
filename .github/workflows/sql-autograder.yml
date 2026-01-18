@@ -35,7 +35,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install -r -r ./.github/scripts/requirements.txt
+          pip install -r ./.github/scripts/requirements.txt
 
       - name: Run tests
         id: pytest
