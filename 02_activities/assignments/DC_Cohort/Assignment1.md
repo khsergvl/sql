@@ -152,7 +152,7 @@ Steps to complete this part of the assignment:
 - Open the assignment1.sql file in DB Browser for SQLite:
 	- from [Github](./02_activities/assignments/assignment1.sql)
 	- or, from your local forked repository  
-- Complete each question
+- Complete each question, passing sql between QUERY and END QUERY terms. 
 
 ### Write SQL
 
