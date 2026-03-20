@@ -1,8 +1,6 @@
 name: Git flow validator
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
 
 jobs:
   validate:

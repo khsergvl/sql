@@ -36,8 +36,4 @@ def run_query(conn, sql_file, query_number):
 
 def test_assignment1_query1(sqlite_db):
     rows = run_query(sqlite_db, "02_activities/assignments/DC_Cohort/assignment1.sql", 1)
-
-    assert len(rows) > 0, "Query returned no rows"
-
-    for name, age in rows:
-        assert age > 25, f"User {name} is not older than 25"
+    assert False,  "test execution result {}".format(rows)
