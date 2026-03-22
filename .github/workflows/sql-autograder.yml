@@ -50,7 +50,7 @@ jobs:
             const fs = require('fs')
             const results = fs.readFileSync('test-results.json', 'utf8')
             let body = `### 🧪 SQL Queries Run Results\n\n`
-            for (result in results) {
+            for (const result of results) {
               body += `✅ Query number: **${result.number}**, Query: **${result.query}**, Reults: **${result.result}**, \n`
             }
             
