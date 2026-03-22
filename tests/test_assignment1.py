@@ -36,7 +36,7 @@ def test_assignment_query(sqlite_db):
     test_result = []
     for number, query in queries.items():
         rows = run_query(sqlite_db, query)
-        test_result.append( { "number":number, "query": query, "result": rows })
+        test_result.append( { "number":number, "query": query, "result": rows[0:3] })
 
     json.dump(test_result, json_file, indent=2)
     json_file.close()
