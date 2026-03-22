@@ -53,7 +53,7 @@ jobs:
             let body = `### 🧪 SQL Queries Run Results\n\n`
             body += `<details> <summary>Click to expand/collapse</summary>` 
             for (const result of results) {
-              body += `✅ Query ${result.number}: ${result.query}**, \n Results: **${result.result}**, \n`
+              body += `✅ Query ${result.number}: ${result.query}**, \n\n Results: **${result.result}**; \n\n`
             }
             body += `</details>`
             
