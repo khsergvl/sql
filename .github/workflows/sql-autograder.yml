@@ -48,14 +48,12 @@ jobs:
         with:
           script: |
             const fs = require('fs')
-            const xml = fs.readFileSync('pytest-report.xml', 'utf8')
-
-            const passed = (xml.match(/testsuite.*tests="(\d+)"/) || [])[1]
-            const failed = (xml.match(/failures="(\d+)"/) || [])[1]
-
-            let body = `### 🧪 SQL Unit Test Results\n\n`
-            body += `✅ Passed: **${passed - failed}**\n`
-            body += `❌ Failed: **${failed}**\n\n`
+            const results = fs.readFileSync('test-results.json', 'utf8')
+            let body = `### 🧪 SQL Queries Run Results\n\n`
+            for (result in results) {
+              body += `✅ Query number: **${result.number}**, Query: **${result.query}**, Reults: **${result.result}**, \n`
+            }
+            
             
             await github.rest.issues.createComment({
               owner: context.repo.owner,

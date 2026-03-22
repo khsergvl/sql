@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 import sqlite3
 import re
@@ -24,16 +25,20 @@ def load_queries(sql_file):
 
     return queries
 
-def run_query(conn, sql_file, query_number):
-    queries = load_queries(sql_file)
-
-    if query_number not in queries:
-        raise AssertionError(f"Query {query_number} not found in {sql_file}")
-
+def run_query(conn, query):
     cursor = conn.cursor()
-    cursor.execute(queries[query_number])
+    cursor.execute(query)
     return cursor.fetchall()
 
-def test_assignment1_query1(sqlite_db):
-    rows = run_query(sqlite_db, "02_activities/assignments/DC_Cohort/assignment1.sql", 1)
-    assert False,  "test execution result {}".format(rows)
+def test_assignment_query(sqlite_db):
+    json_file = open("test-results.json", "w")
+    queries = load_queries("02_activities/assignments/DC_Cohort/assignment1.sql")
+    test_result = []
+    for number, query in queries.items():
+        rows = run_query(sqlite_db, query)
+        test_result.append( { "number":number, "query": query, "result": rows })
+
+    json.dump(test_result, json_file, indent=2)
+    json_file.close()
+    assert True,  "test execution query {} result {}".format(query, rows)
+
