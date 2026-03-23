@@ -170,9 +170,9 @@ VALUES(col1,col2,col3,col4,col5)
 -- QUERY 11
 
 CREATE TABLE temp.new_vendor AS
-SELECT * FROM vendor
+SELECT * FROM vendor;
 
-INSERT INTO temp.new_vendor
+INSERT INTO temp.new_vendor;
 VALUES (10, "Thomass Superfood Store" , "Fresh Focused", "Thomas", "Rosenthal")
 -- END QUERY
 
