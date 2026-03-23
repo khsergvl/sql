@@ -57,6 +57,8 @@ jobs:
         with:
           script: |
             const fs = require('fs')
+            const { Console } = require('node:console')
+            const { Transform } = require('node:stream')
             const ts = new Transform({ transform(chunk, enc, cb) { cb(null, chunk) } })
             const logger = new Console({ stdout: ts })
             const file_read_result = fs.readFileSync('test-results.json', 'utf8')
