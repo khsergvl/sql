@@ -16,7 +16,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  test:
+  run-assignment-queries:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -37,10 +37,28 @@ jobs:
         run: |
           pip install -r ./.github/scripts/requirements.txt
 
+      - name: Get changed files
+        id: changes
+        run: |
+          BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          HEAD_SHA="${{ github.event.pull_request.head.sha }}"
+      
+          git diff --name-only "$BASE_SHA" "$HEAD_SHA" > changed_files.txt
+      
+          echo "Changed files:"
+          cat changed_files.txt
+      
+          if grep -qE '(^|/)assignment-2\.sql$' changed_files.txt; then
+            echo "assignment_changed=test_assignment_2" >> "$GITHUB_OUTPUT"
+          fi
+          if grep -qE '(^|/)assignment-1\.sql$' changed_files.txt; then
+            echo "assignment_changed=test_assignment_1" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Run tests
         id: pytest
         run: |
-          pytest --tb=short --disable-warnings \
+          pytest tests/test_assignment.py::${{steps.changes.outputs.assignment_changed}} --tb=short --disable-warnings \
                  --junitxml=pytest-report.xml || true
 
       - name: Post test results to PR

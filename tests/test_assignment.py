@@ -1,0 +1,83 @@
+import json
+from pathlib import Path
+import sqlite3
+import re
+
+def load_queries(sql_file):
+    lines = Path(sql_file).read_text().splitlines()
+
+    queries = []
+    current_query = None
+    buffer = []
+
+    for line in lines:
+        stripped = line.strip()
+
+        # Start marker: -- QUERY <n>
+        if stripped.lower().startswith("-- query"):
+            if current_query is not None:
+                raise AssertionError("Nested QUERY blocks are not allowed")
+
+            parts = stripped.split()
+            if len(parts) < 3:
+                raise AssertionError(f"Invalid QUERY marker: {line}")
+
+            try:
+                current_query = int(parts[2])
+            except ValueError:
+                raise AssertionError(f"Invalid QUERY number: {line}")
+
+            buffer = []
+            continue
+
+        # End marker: -- END QUERY or -- END STATEMENT
+        if stripped.lower().startswith("-- end"):
+            if current_query is None:
+                continue  # ignore stray END
+
+            query = "\n".join(buffer).strip().rstrip(";")
+
+            queries.append({
+                "number": current_query,
+                "query": query
+            })
+
+            current_query = None
+            buffer = []
+            continue
+
+        # Collect lines inside a query block
+        if current_query is not None:
+            buffer.append(line)
+
+    if not queries:
+        raise AssertionError(
+            "No queries found. Use '-- QUERY <n>' and '-- END QUERY' markers."
+        )
+
+    return queries
+
+def run_query(conn, query):
+    cursor = conn.cursor()
+    cursor.execute(query)
+    return cursor.fetchall()
+
+def test_assignment_1(sqlite_db):
+    run_assignment(sqlite_db, "02_activities/assignments/DC_Cohort/assignment1.sql")
+
+def test_assignment_2(sqlite_db):
+    run_assignment(sqlite_db, "02_activities/assignments/DC_Cohort/assignment2.sql")
+
+def run_assignment(sqlite_db, file_name):
+    json_file = open("test-results.json", "w")
+    queries = load_queries(file_name)
+    test_result = []
+    for parsed_query in queries:
+        rows = run_query(sqlite_db, parsed_query['query'])
+        test_result.append( { "number": parsed_query['number'], "query": parsed_query['query'], "result": rows[0:3] })
+
+    json.dump(test_result, json_file, indent=2)
+    json_file.close()
+    assert True,  "test execution query {} result {}".format(queries, test_result)
+
+
