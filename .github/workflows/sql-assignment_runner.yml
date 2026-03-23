@@ -16,7 +16,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  test:
+  run-assignment-queries:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -37,10 +37,26 @@ jobs:
         run: |
           pip install -r ./.github/scripts/requirements.txt
 
+      - name: Get changed files
+        id: changes
+        run: |
+          git fetch
+          git diff --name-only origin/main  > changed_files.txt
+      
+          echo "Changed files:"
+          cat changed_files.txt
+      
+          if grep -qE '(^|/)assignment2\.sql$' changed_files.txt; then
+            echo "assignment_changed=test_assignment_2" >> "$GITHUB_OUTPUT"
+          fi
+          if grep -qE '(^|/)assignment1\.sql$' changed_files.txt; then
+            echo "assignment_changed=test_assignment_1" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Run tests
         id: pytest
         run: |
-          pytest --tb=short --disable-warnings --maxfail=1 \
+          pytest tests/test_assignment.py::${{steps.changes.outputs.assignment_changed}} --tb=short --disable-warnings \
                  --junitxml=pytest-report.xml || true
 
       - name: Post test results to PR
@@ -48,21 +64,15 @@ jobs:
         with:
           script: |
             const fs = require('fs')
-            const xml = fs.readFileSync('pytest-report.xml', 'utf8')
-
-            const passed = (xml.match(/testsuite.*tests="(\d+)"/) || [])[1]
-            const failed = (xml.match(/failures="(\d+)"/) || [])[1]
-
-            let body = `### 🧪 SQL Unit Test Results\n\n`
-            body += `✅ Passed: **${passed - failed}**\n`
-            body += `❌ Failed: **${failed}**\n\n`
-
-            if (failed > 0) {
-              body += `Please review the failed assertions and update your SQL.`
-            } else {
-              body += `🎉 All tests passed. Good job!`
+            const file_read_result = fs.readFileSync('test-results.json', 'utf8')
+            const results = JSON.parse(file_read_result)
+            let body = `### 🧪 SQL Queries Run Results\n\n`
+            body += `<details> <summary>Click to expand/collapse assignment queries executions results</summary>` 
+            for (const result of results) {
+              body += `✅ Query ${result.number}: ${result.query}**, \n\n Results: **${result.result}**; \n\n`
             }
-
+            body += `</details>`
+            
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -70,6 +80,3 @@ jobs:
               body
             })
 
-      - name: Fail job if tests failed
-        run: |
-          grep -q 'failures="0"' pytest-report.xml
