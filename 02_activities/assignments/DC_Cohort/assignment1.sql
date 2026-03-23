@@ -12,12 +12,23 @@ SELECT * FROM customer limit 1;
 sorted by customer_last_name, then customer_first_ name. */
 -- QUERY 2
 
-
+SELECT *
+FROM customer
+ORDER BY customer_last_name, customer_first_name
+LIMIT 10;
 -- END QUERY
 --WHERE
 /* 1. Write a query that returns all customer purchases of product IDs 4 and 9. */
 -- QUERY 3
-
+SELECT
+market_date,
+customer_id,
+vendor_id,
+product_id,
+quantity,
+quantity * cost_to_customer_per_qty AS price
+FROM customer_purchases
+WHERE product_id IN (4, 9)
 
 -- END QUERY
 
@@ -29,13 +40,31 @@ filtered by customer IDs between 8 and 10 (inclusive) using either:
 */
 -- option 1
 -- QUERY 4
-
+SELECT
+market_date,
+customer_id,
+vendor_id,
+product_id,
+quantity,
+quantity * cost_to_customer_per_qty AS price
+FROM customer_purchases
+WHERE customer_id >= 8
+AND customer_id <= 10
 
 -- END QUERY
 
 -- option 2
 -- QUERY 5
-
+SELECT
+market_date,
+customer_id,
+vendor_id,
+product_id,
+quantity,
+quantity * cost_to_customer_per_qty AS price
+FROM customer_purchases
+WHERE customer_id BETWEEN 8 AND 10
+ORDER BY market_date, vendor_id, product_id
 
 -- END QUERY
 
@@ -46,7 +75,12 @@ Using the product table, write a query that outputs the product_id and product_n
 columns and add a column called prod_qty_type_condensed that displays the word “unit” 
 if the product_qty_type is “unit,” and otherwise displays the word “bulk.” */
 -- QUERY 6
-
+SELECT
+product_id,
+product_name,
+CASE WHEN product_qty_type = "unit" THEN "unit"
+ELSE "bulk" END AS prod_qty_type_condensed
+FROM product
 
 -- END QUERY
 
@@ -55,7 +89,12 @@ if the product_qty_type is “unit,” and otherwise displays the word “bulk.�
 add a column to the previous query called pepper_flag that outputs a 1 if the product_name 
 contains the word “pepper” (regardless of capitalization), and otherwise outputs 0. */
 -- QUERY 7
-
+SELECT
+product_id,
+product_name,
+CASE WHEN product_name LIKE '%epper%'
+THEN 1 ELSE 0 END AS pepper_flag
+FROM product
 
 -- END QUERY
 
@@ -64,7 +103,11 @@ contains the word “pepper” (regardless of capitalization), and otherwise out
 /* 1. Write a query that INNER JOINs the vendor table to the vendor_booth_assignments table on the 
 vendor_id field they both have in common, and sorts the result by vendor_name, then market_date. */
 -- QUERY 8
-
+SELECT *
+FROM vendor AS v
+INNER JOIN vendor_booth_assignments AS vba
+    ON v.vendor_id = vba.vendor_id
+ORDER BY v.vendor_name, vba.market_date
 
 -- END QUERY
 
@@ -76,7 +119,11 @@ vendor_id field they both have in common, and sorts the result by vendor_name, t
 /* 1. Write a query that determines how many times each vendor has rented a booth 
 at the farmer’s market by counting the vendor booth assignments per vendor_id. */
 -- QUERY 9
-
+SELECT
+vendor_id,
+count(*) AS count_of_booth_assignments
+FROM vendor_booth_assignments
+GROUP BY vendor_id
 
 -- END QUERY
 
@@ -88,7 +135,24 @@ of customers for them to give stickers to, sorted by last name, then first name.
 HINT: This query requires you to join two tables, use an aggregate function, and use the HAVING keyword. */
 -- QUERY 10
 
+SELECT
+cp.customer_id,
+c.customer_first_name,
+c.customer_last_name,
+SUM(quantity * cost_to_customer_per_qty) AS total_spent
 
+FROM customer c
+LEFT JOIN customer_purchases cp
+    ON c.customer_id = cp.customer_id
+
+GROUP BY
+cp.customer_id,
+c.customer_first_name,
+c.customer_last_name
+
+HAVING total_spent > 2000
+
+ORDER BY c.customer_last_name, c.customer_first_name
 -- END QUERY
 
 
@@ -105,7 +169,11 @@ VALUES(col1,col2,col3,col4,col5)
 */
 -- QUERY 11
 
+CREATE TABLE temp.new_vendor AS
+SELECT * FROM vendor
 
+INSERT INTO temp.new_vendor
+VALUES (10, "Thomass Superfood Store" , "Fresh Focused", "Thomas", "Rosenthal")
 -- END QUERY
 
 
@@ -115,7 +183,11 @@ VALUES(col1,col2,col3,col4,col5)
 HINT: you might need to search for strfrtime modifers sqlite on the web to know what the modifers for month 
 and year are! */
 -- QUERY 12
+SELECT customer_id,
+STRFTIME('%m',market_date) AS purchase_month,
+STRFTIME('%Y', market_date) AS purchase_year
 
+FROM customer_purchases
 
 -- END QUERY
 
@@ -127,7 +199,17 @@ HINTS: you will need to AGGREGATE, GROUP BY, and filter...
 but remember, STRFTIME returns a STRING for your WHERE statement!! */
 
 -- QUERY 13
+SELECT customer_id,
+STRFTIME('%m',market_date) AS purchase_month,
+STRFTIME('%Y', market_date) AS purchase_year,
+SUM(quantity*cost_to_customer_per_qty)
 
+FROM customer_purchases
+
+WHERE STRFTIME('%Y', market_date)  = '2023'
+AND STRFTIME('%m',market_date) = '04'
+
+GROUP BY STRFTIME('%Y', market_date) ,STRFTIME('%m', market_date), customer_id
 
 -- END QUERY
 
