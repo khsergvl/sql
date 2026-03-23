@@ -126,7 +126,7 @@ Remember that money spent is quantity*cost_to_customer_per_qty.
 HINTS: you will need to AGGREGATE, GROUP BY, and filter...
 but remember, STRFTIME returns a STRING for your WHERE statement!! */
 
--- QUERY 12
+-- QUERY 13
 
 
 -- END QUERY

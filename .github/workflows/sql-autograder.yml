@@ -40,10 +40,7 @@ jobs:
       - name: Get changed files
         id: changes
         run: |
-          BASE_SHA="${{ github.event.pull_request.base.sha }}"
-          HEAD_SHA="${{ github.event.pull_request.head.sha }}"
-      
-          git diff --name-only "$BASE_SHA" "$HEAD_SHA" > changed_files.txt
+          git diff --name-only origin/${{ github.base_ref }} > changed_files.txt
       
           echo "Changed files:"
           cat changed_files.txt
