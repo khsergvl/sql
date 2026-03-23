@@ -40,6 +40,7 @@ jobs:
       - name: Get changed files
         id: changes
         run: |
+          git fetch
           git diff --name-only origin/main...HEAD  > changed_files.txt
       
           echo "Changed files:"
