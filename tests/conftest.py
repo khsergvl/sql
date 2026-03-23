@@ -10,6 +10,7 @@ def sqlite_db():
 
     # Load schema.db into memory
     disk_db = sqlite3.connect(source_db)
+    conn.row_factory = sqlite3.Row
     disk_db.backup(conn)
     disk_db.close()
 

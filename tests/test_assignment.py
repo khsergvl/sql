@@ -60,7 +60,8 @@ def load_queries(sql_file):
 def run_query(conn, query):
     cursor = conn.cursor()
     cursor.execute(query)
-    return cursor.fetchall()
+    rows = cursor.fetchall()
+    return [dict(row) for row in rows]
 
 def test_assignment_1(sqlite_db):
     run_assignment(sqlite_db, "02_activities/assignments/DC_Cohort/assignment1.sql")

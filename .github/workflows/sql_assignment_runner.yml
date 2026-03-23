@@ -57,15 +57,17 @@ jobs:
         with:
           script: |
             const fs = require('fs')
+            const ts = new Transform({ transform(chunk, enc, cb) { cb(null, chunk) } })
+            const logger = new Console({ stdout: ts })
             const file_read_result = fs.readFileSync('test-results.json', 'utf8')
             const results = JSON.parse(file_read_result)
             let body = `### 🧪 SQL Queries Run Results\n\n`
-            body += `<details> <summary>Click to expand/collapse assignment queries execution results</summary>` 
+            body += `<details> <summary>Click to expand/collapse assignment queries execution results</summary>`
             for (const result of results) {
-              body += `✅ Query ${result.number}: ${result.query}, \n\n Results:  \n`
-              for (const individual_row of result.result) {
-                body +=  `**${individual_row}**; \n`
-              }
+                body += `✅ Query ${result.number}: ${result.query}, \n\n Results:  \n`
+                logger.table(result.result)
+                const table = (ts.read() || '').toString()
+                body +=  `${table} \n`
             }
             body += `</details>`
             
