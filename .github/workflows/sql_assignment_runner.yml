@@ -60,7 +60,7 @@ jobs:
             const file_read_result = fs.readFileSync('test-results.json', 'utf8')
             const results = JSON.parse(file_read_result)
             let body = `### 🧪 SQL Queries Run Results\n\n`
-            body += `<details> <summary>Click to expand/collapse assignment queries executions results</summary>` 
+            body += `<details> <summary>Click to expand/collapse assignment queries execution results</summary>` 
             for (const result of results) {
               body += `✅ Query ${result.number}: ${result.query}, \n\n Results:  \n`
               for (const individual_row of result.result) {
