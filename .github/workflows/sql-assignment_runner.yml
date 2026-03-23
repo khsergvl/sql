@@ -46,10 +46,10 @@ jobs:
           echo "Changed files:"
           cat changed_files.txt
       
-          if grep -qE '(^|/)assignment-2\.sql$' changed_files.txt; then
+          if grep -qE '(^|/)assignment2\.sql$' changed_files.txt; then
             echo "assignment_changed=test_assignment_2" >> "$GITHUB_OUTPUT"
           fi
-          if grep -qE '(^|/)assignment-1\.sql$' changed_files.txt; then
+          if grep -qE '(^|/)assignment1\.sql$' changed_files.txt; then
             echo "assignment_changed=test_assignment_1" >> "$GITHUB_OUTPUT"
           fi
 
