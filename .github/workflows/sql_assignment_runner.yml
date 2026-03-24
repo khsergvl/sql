@@ -92,6 +92,8 @@ jobs:
                 body += `✅ Query ${result.number}: ${result.query}, \n\n Results:  \n`
                 const table = jsonToMarkdownTable(result.result)
                 body +=  `${table} \n`
+                body += `\n`
+                body += `-------------------------------------------------------- \n` 
             }
             body += `</details>`
             
