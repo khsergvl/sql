@@ -89,7 +89,7 @@ jobs:
             let body = `### 🧪 SQL Queries Run Results\n\n`
             body += `<details> <summary>Click to expand/collapse assignment queries execution results</summary>`
             for (const result of results) {
-                body += `✅ Query ${result.number}: ${result.query}, \n\n Results:  \n`
+                body += `✅ Query ${result.number}: \n\n ${result.query}, \n\n Results:  \n`
                 const table = jsonToMarkdownTable(result.result)
                 body +=  `${table} \n`
                 body += `\n`
