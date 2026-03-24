@@ -56,19 +56,41 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
+            function jsonToMarkdownTable(data) {
+              if (!Array.isArray(data) || data.length === 0) {
+                return 'No data';
+              }
+              
+              const headers = Object.keys(data[0]);
+              
+              // Header row
+              const headerRow = `| ${headers.join(' | ')} |`;
+              
+              // Separator row
+              const separatorRow = `| ${headers.map(() => '---').join(' | ')} |`;
+              
+              // Data rows
+              const rows = data.map(row =>
+                `| ${headers.map(h => formatValue(row[h])).join(' | ')} |`
+              );
+              
+              return [headerRow, separatorRow, ...rows].join('\n');
+              }
+              
+            function formatValue(value) {
+              if (value === null || value === undefined) return '';
+              if (typeof value === 'object') return `\`${JSON.stringify(value)}\``;
+              return String(value);
+            }
+          
             const fs = require('fs')
-            const { Console } = require('node:console')
-            const { Transform } = require('node:stream')
-            const ts = new Transform({ transform(chunk, enc, cb) { cb(null, chunk) } })
-            const logger = new Console({ stdout: ts })
             const file_read_result = fs.readFileSync('test-results.json', 'utf8')
             const results = JSON.parse(file_read_result)
             let body = `### 🧪 SQL Queries Run Results\n\n`
             body += `<details> <summary>Click to expand/collapse assignment queries execution results</summary>`
             for (const result of results) {
                 body += `✅ Query ${result.number}: ${result.query}, \n\n Results:  \n`
-                logger.table(result.result)
-                const table = (ts.read() || '').toString()
+                const table = jsonToMarkdownTable(result.result)
                 body +=  `${table} \n`
             }
             body += `</details>`
