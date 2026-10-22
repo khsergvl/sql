@@ -66,7 +66,10 @@ if the product_qty_type is “unit,” and otherwise displays the word “bulk.�
 add a column to the previous query called pepper_flag that outputs a 1 if the product_name 
 contains the word “pepper” (regardless of capitalization), and otherwise outputs 0. */
 --QUERY 6
-
+SELECT *,
+CASE WHEN INSTR(product_name,'-') > 0
+  THEN LTRIM(RTRIM(SUBSTR(product_name,INSTR(product_name,'-')+1)))
+  ELSE NULL END AS description
 
 
 
